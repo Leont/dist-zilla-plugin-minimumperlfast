@@ -38,7 +38,7 @@ no Moose;
 
 1;
 
-# ABSTRACT: Fast minimum perl version finder
+# ABSTRACT: Quickly detects the minimum version of Perl required for your dist
 
 =head1 DESCRIPTION
 
