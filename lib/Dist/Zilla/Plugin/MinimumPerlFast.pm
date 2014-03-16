@@ -4,9 +4,10 @@ use warnings;
 
 use Moose;
 
-use MooseX::Types::Perl 0.101340 qw( LaxVersionStr );
+use Carp 'croak';
+use MooseX::Types::Perl 0.101340 qw( StrictVersionStr );
 use Perl::MinimumVersion::Fast;
-use List::Util 'max';
+use List::Util qw//;
 
 with(
 	'Dist::Zilla::Role::PrereqSource' => { -version => '4.102345' },
@@ -16,21 +17,37 @@ with(
 	},
 );
 
-has perl => (
+has version => (
 	is      => 'ro',
 	lazy    => 1,
-	isa     => 'version',
-	builder => '_build_perl',
+	isa     => StrictVersionStr,
+	builder => '_build_version',
 );
 
-sub _build_perl {
+has min => (
+	is      => 'ro',
+	lazy    => 1,
+	isa     => StrictVersionStr,
+	default => '5.008'
+);
+
+has max => (
+	is        => 'ro',
+	isa       => StrictVersionStr,
+	required  => 0,
+);
+
+sub _build_version {
 	my $self = shift;
-	return max map { Perl::MinimumVersion::Fast->new(\$_->content)->minimum_version } grep { $_->name =~ /\.(?:t|p[ml])$/i } @{ $self->found_files };
+	return List::Util::max($self->min, map { Perl::MinimumVersion::Fast->new(\$_->content)->minimum_version->stringify } @{ $self->found_files });
 }
 
 sub register_prereqs {
 	my $self = shift;
-	$self->zilla->register_prereqs({ phase => 'runtime' }, perl => $self->perl->stringify);
+	my $version = $self->version;
+	my $max = $self->max;
+	croak "Required perl version $version is higher than maximum $max" if defined $max && $version > $max;
+	$self->zilla->register_prereqs({ phase => 'runtime' }, perl => $version);
 	return;
 }
 

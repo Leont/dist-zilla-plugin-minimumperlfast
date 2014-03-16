@@ -1,6 +1,7 @@
 Revision history for Dist-Zilla-Plugin-MinimumPerlFast
 
 {{$NEXT}}
+          Switched to strict version strings
           Fixed documention
 
 0.001     2013-05-29 22:13:35 Europe/Amsterdam
