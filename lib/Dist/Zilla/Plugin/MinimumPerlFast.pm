@@ -10,9 +10,9 @@ use Perl::MinimumVersion::Fast;
 use List::Util qw//;
 
 with(
-	'Dist::Zilla::Role::PrereqSource' => { -version => '4.102345' },
+	'Dist::Zilla::Role::PrereqSource' => { -version => '5' },
 	'Dist::Zilla::Role::FileFinderUser' => {
-		-version => '4.102345',
+		-version => '5',
 		default_finders => [ ':InstallModules', ':ExecFiles', ':TestFiles' ]
 	},
 );
@@ -39,7 +39,15 @@ has max => (
 
 sub _build_version {
 	my $self = shift;
-	return List::Util::max($self->min, map { Perl::MinimumVersion::Fast->new(\$_->content)->minimum_version->stringify } @{ $self->found_files });
+	return List::Util::max($self->min, map { Perl::MinimumVersion::Fast->new(\$_->content)->minimum_version->stringify } $self->_perl_files);
+}
+
+my $suffix = qr/\.(?:pm|pl|t)$/i;
+my $shebang = qr/^#!(?:.*)perl(?:$|\s)/;
+
+sub _perl_files {
+	my $self = shift;
+	return grep { ! $_->is_bytes && ($_->name =~ $suffix || $_->content =~ $shebang) } @{ $self->found_files };
 }
 
 sub register_prereqs {
@@ -64,7 +72,7 @@ This plugin uses L<Perl::MinimumVersion::Fast> to automatically find the minimum
  # In your dist.ini:
  [MinimumPerl]
 
-This plugin will search for files matching C</\.(t|pl|pm)$/i> in the C<lib/>, C<bin/>, and C<t/> directories.
+This plugin will search for files matching C</\.(t|pl|pm)$/i> or that have a C<perl> in the C<!#..> line in the C<lib/>, C<bin/>, and C<t/> directories.
 
 =head1 SEE ALSO
 Dist::Zilla
