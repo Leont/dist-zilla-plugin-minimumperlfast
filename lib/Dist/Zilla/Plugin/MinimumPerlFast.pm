@@ -62,7 +62,7 @@ no Moose;
 This plugin uses L<Perl::MinimumVersion::Fast> to automatically find the minimum version of Perl required for your dist and adds it to the prereqs.
 
  # In your dist.ini:
- [MinimumPerl]
+ [MinimumPerlFast]
 
 This plugin will search for files matching C</\.(t|pl|pm)$/i> in the C<lib/>, C<bin/>, and C<t/> directories.
 
