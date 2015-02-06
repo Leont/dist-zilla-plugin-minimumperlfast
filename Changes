@@ -1,6 +1,7 @@
 Revision history for Dist-Zilla-Plugin-MinimumPerlFast
 
 {{$NEXT}}
+          Only checks .pm, .pl, or .t files or files with perl in shebang
 
 0.003     2015-02-04 21:20:29+01:00 Europe/Amsterdam
           Correct plugin name in description
