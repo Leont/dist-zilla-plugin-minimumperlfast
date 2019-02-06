@@ -39,7 +39,7 @@ has max => (
 
 sub _build_version {
 	my $self = shift;
-	return List::Util::max($self->min, map { Perl::MinimumVersion::Fast->new(\$_->content)->minimum_version->stringify } @{ $self->found_files });
+	return List::Util::max($self->min, map { Perl::MinimumVersion::Fast->new(\$_->content)->minimum_version->numify } @{ $self->found_files });
 }
 
 sub register_prereqs {
