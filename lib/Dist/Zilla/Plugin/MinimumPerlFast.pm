@@ -36,7 +36,7 @@ has version => (
 	builder => '_build_version',
 );
 
-has min => (
+has default_version => (
 	is      => 'ro',
 	lazy    => 1,
 	isa     => StrictVersionStr,
@@ -46,7 +46,7 @@ has min => (
 sub _build_version {
 	my $self = shift;
 	my @files = @{ $self->found_runtime }, @{ $self->found_configure }, grep { /\.(t|pm)$/ } @{ $self->found_tests };
-	return max($self->min, map { Perl::MinimumVersion::Fast->new(\$_->content)->minimum_version->numify } @files);
+	return max($self->default_version, map { Perl::MinimumVersion::Fast->new(\$_->content)->minimum_version->numify } @files);
 }
 
 sub register_prereqs {
