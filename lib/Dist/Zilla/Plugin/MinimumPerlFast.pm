@@ -70,6 +70,14 @@ This plugin uses L<Perl::MinimumVersion::Fast> to automatically find the minimum
 
 This plugin will search for files matching C</\.(t|pl|pm)$/i> in the C<lib/>, C<bin/>, and C<t/> directories.
 
+=attr version
+
+The minimum version of perl for this module. Determining this is the reason for existence of this module, but if necessary this can easily be overridden.
+
+=attr default_version
+
+The minimum version that is used if no minimum can be detected. By default it's C<5.008> because that's the oldest that C<Perl::MinimumVersion::Fast> can detect.
+
 =head1 SEE ALSO
 Dist::Zilla
 
