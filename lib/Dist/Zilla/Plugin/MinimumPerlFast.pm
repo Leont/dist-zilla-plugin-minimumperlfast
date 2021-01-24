@@ -8,7 +8,7 @@ use Moose;
 use Carp 'croak';
 use MooseX::Types::Perl 0.101340 qw( StrictVersionStr );
 use Perl::MinimumVersion::Fast;
-use List::Util qw//;
+use List::Util qw/max/;
 
 with(
 	'Dist::Zilla::Role::PrereqSource' => { -version => '4.102345' },
@@ -38,24 +38,15 @@ has min => (
 	default => '5.008'
 );
 
-has max => (
-	is        => 'ro',
-	isa       => StrictVersionStr,
-	required  => 0,
-);
-
 sub _build_version {
 	my $self = shift;
 	my @files = @{ $self->found_runtime }, grep { /\.(t|pm)$/ } @{ $self->found_tests };
-	return List::Util::max($self->min, map { Perl::MinimumVersion::Fast->new(\$_->content)->minimum_version->numify } @files);
+	return max($self->min, map { Perl::MinimumVersion::Fast->new(\$_->content)->minimum_version->numify } @files);
 }
 
 sub register_prereqs {
 	my $self = shift;
-	my $version = $self->version;
-	my $max = $self->max;
-	croak "Required perl version $version is higher than maximum $max" if defined $max && $version > $max;
-	$self->zilla->register_prereqs({ phase => 'runtime' }, perl => $version);
+	$self->zilla->register_prereqs({ phase => 'runtime' }, perl => $self->version);
 	return;
 }
 
