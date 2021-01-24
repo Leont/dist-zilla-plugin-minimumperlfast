@@ -13,8 +13,14 @@ use List::Util qw//;
 with(
 	'Dist::Zilla::Role::PrereqSource' => { -version => '4.102345' },
 	'Dist::Zilla::Role::FileFinderUser' => {
-		-version => '4.102345',
-		default_finders => [ ':InstallModules', ':ExecFiles', ':TestFiles' ]
+		finder_arg_names => [ 'runtime_finder' ],
+		method => 'found_runtime',
+		default_finders => [ ':InstallModules', ':ExecFiles', ':IncModules' ]
+	},
+	'Dist::Zilla::Role::FileFinderUser' => {
+		finder_arg_names => [ 'test_finder' ],
+		method => 'found_tests',
+		default_finders => [ ':TestFiles' ]
 	},
 );
 
@@ -40,7 +46,8 @@ has max => (
 
 sub _build_version {
 	my $self = shift;
-	return List::Util::max($self->min, map { Perl::MinimumVersion::Fast->new(\$_->content)->minimum_version->numify } @{ $self->found_files });
+	my @files = @{ $self->found_runtime }, grep { /\.(t|pm)$/ } @{ $self->found_tests };
+	return List::Util::max($self->min, map { Perl::MinimumVersion::Fast->new(\$_->content)->minimum_version->numify } @files);
 }
 
 sub register_prereqs {
