@@ -45,7 +45,7 @@ has default_version => (
 
 sub _build_version {
 	my $self = shift;
-	my @files = @{ $self->found_runtime }, @{ $self->found_configure }, grep { /\.(t|pm)$/ } @{ $self->found_tests };
+	my @files = ( @{ $self->found_runtime }, @{ $self->found_configure }, grep { /\.(t|pm)$/ } @{ $self->found_tests } );
 	return max($self->default_version, map { Perl::MinimumVersion::Fast->new(\$_->content)->minimum_version->numify } @files);
 }
 
